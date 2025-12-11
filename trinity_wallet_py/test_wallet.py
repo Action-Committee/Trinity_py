@@ -116,7 +116,8 @@ def test_invalid_addresses():
     
     for addr in invalid_addresses:
         result = validate_address(addr)
-        print(f"  '{addr[:30]}...' is valid: {result}")
+        display_addr = addr if len(addr) <= 30 else f"{addr[:30]}..."
+        print(f"  '{display_addr}' is valid: {result}")
         assert not result, f"Invalid address {addr} was marked as valid"
     
     print("✓ Invalid address detection tests passed\n")

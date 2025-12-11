@@ -112,11 +112,24 @@ The wallet stores keys and labels in:
 
 ## Security Notes
 
-1. **Backup your wallet**: The wallet.json file contains all your private keys
-2. **Secure your RPC connection**: Use strong RPC passwords
-3. **Keep software updated**: Always use the latest version
-4. **Verify addresses**: Always double-check addresses before sending
-5. **Private key safety**: Never share your private keys
+**IMPORTANT SECURITY INFORMATION:**
+
+1. **Wallet File Encryption**: Private keys are stored in plain JSON format in the wallet.json file. The file is protected with restrictive permissions (600), but is NOT encrypted. To enhance security:
+   - Use full-disk encryption on your system
+   - Store wallet backups in encrypted containers
+   - Consider using Trinity Core wallet for encrypted storage if higher security is needed
+   - Keep your operating system and antivirus updated
+
+2. **RPC Connection Security**: The wallet uses unencrypted HTTP for RPC communication. This is safe for localhost connections but should NOT be used over networks. For remote connections:
+   - Use SSH tunneling to secure the connection
+   - Use a VPN for remote access
+   - Never expose RPC ports to the internet
+
+3. **Backup your wallet**: The wallet.json file contains all your private keys
+4. **Secure your RPC connection**: Use strong RPC passwords
+5. **Keep software updated**: Always use the latest version
+6. **Verify addresses**: Always double-check addresses before sending
+7. **Private key safety**: Never share your private keys
 
 ## Architecture
 

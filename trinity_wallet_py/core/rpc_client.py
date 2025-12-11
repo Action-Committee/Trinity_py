@@ -9,7 +9,14 @@ from typing import Any, Dict, Optional
 
 
 class TrinityRPCClient:
-    """Client for Trinity RPC interface."""
+    """
+    Client for Trinity RPC interface.
+    
+    SECURITY NOTE: This client uses unencrypted HTTP for RPC communication.
+    This is acceptable for localhost connections (127.0.0.1) but should NOT
+    be used over untrusted networks. For remote connections, use SSH tunneling
+    or a VPN to secure the connection.
+    """
     
     def __init__(self, host='127.0.0.1', port=6420, username='', password=''):
         """

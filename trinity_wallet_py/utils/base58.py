@@ -8,6 +8,9 @@ import hashlib
 # Base58 alphabet (Bitcoin-style)
 B58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
+# Create lookup dictionary for faster decoding
+B58_LOOKUP = {char: idx for idx, char in enumerate(B58_ALPHABET)}
+
 
 def b58encode(data):
     """Encode bytes to base58 string."""
@@ -41,7 +44,7 @@ def b58decode(s):
     # Convert base58 to integer
     num = 0
     for char in s:
-        num = num * 58 + B58_ALPHABET.index(char)
+        num = num * 58 + B58_LOOKUP[char]
     
     # Convert integer to bytes
     combined = num.to_bytes((num.bit_length() + 7) // 8, 'big')

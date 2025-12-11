@@ -12,7 +12,17 @@ from .rpc_client import TrinityRPCClient
 
 
 class Wallet:
-    """Trinity wallet implementation."""
+    """
+    Trinity wallet implementation.
+    
+    SECURITY NOTE: Private keys are stored in plain JSON format in the wallet file.
+    The file is protected with restrictive permissions (0o600), but is not encrypted.
+    Users should:
+    - Keep their system secure
+    - Use full-disk encryption
+    - Backup wallet files securely
+    - Consider using the Trinity Core wallet for encrypted storage
+    """
     
     def __init__(self, wallet_path: Optional[str] = None):
         """
@@ -25,7 +35,7 @@ class Wallet:
             # Default wallet location in user's home directory
             home = Path.home()
             wallet_dir = home / '.trinity_wallet'
-            wallet_dir.mkdir(exist_ok=True)
+            wallet_dir.mkdir(mode=0o700, exist_ok=True)
             wallet_path = wallet_dir / 'wallet.json'
         
         self.wallet_path = Path(wallet_path)

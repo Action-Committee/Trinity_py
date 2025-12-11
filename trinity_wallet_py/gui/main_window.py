@@ -26,8 +26,9 @@ class TrinityWalletGUI:
         # Initialize wallet
         try:
             self.wallet = Wallet()
-        except:
+        except Exception as e:
             # Create new wallet if loading fails
+            print(f"Could not load existing wallet: {e}")
             self.wallet = Wallet()
         
         # Auto-connect to local node
