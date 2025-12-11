@@ -43,8 +43,11 @@ jobs:
     
     - name: Create release ZIP
       run: |
-        cd trinity_wallet_py/dist
-        Compress-Archive -Path TrinityWallet.exe,../README.md,../INSTALL.md -DestinationPath TrinityWallet-Windows.zip
+        cd trinity_wallet_py
+        Copy-Item README.md dist/
+        Copy-Item INSTALL.md dist/
+        cd dist
+        Compress-Archive -Path TrinityWallet.exe,README.md,INSTALL.md -DestinationPath TrinityWallet-Windows.zip
     
     - name: Upload Windows ZIP
       uses: actions/upload-artifact@v3
@@ -85,8 +88,10 @@ jobs:
     
     - name: Create release tarball
       run: |
-        cd trinity_wallet_py/dist
-        tar -czf TrinityWallet-Linux.tar.gz TrinityWallet ../README.md ../INSTALL.md
+        cd trinity_wallet_py
+        cp README.md INSTALL.md dist/
+        cd dist
+        tar -czf TrinityWallet-Linux.tar.gz TrinityWallet README.md INSTALL.md
     
     - name: Upload Linux tarball
       uses: actions/upload-artifact@v3
@@ -125,8 +130,10 @@ jobs:
     
     - name: Create release tarball
       run: |
-        cd trinity_wallet_py/dist
-        tar -czf TrinityWallet-macOS.tar.gz TrinityWallet ../README.md ../INSTALL.md
+        cd trinity_wallet_py
+        cp README.md INSTALL.md dist/
+        cd dist
+        tar -czf TrinityWallet-macOS.tar.gz TrinityWallet README.md INSTALL.md
     
     - name: Upload macOS tarball
       uses: actions/upload-artifact@v3
