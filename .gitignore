@@ -30,6 +30,9 @@ qrc_*.cpp
 .DS_Store
 build
 
+# Python build artifacts at root
+dist/
+
 s
 
 # Python

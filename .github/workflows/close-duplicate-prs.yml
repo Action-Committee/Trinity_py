@@ -1,0 +1,43 @@
+name: Close duplicate PRs
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  close-duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Close duplicate PRs by title or head branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const current = context.payload.pull_request;
+            if (!current) {
+              core.info('No pull_request payload, exiting.');
+              return;
+            }
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const currentNumber = current.number;
+            const currentTitle = current.title;
+            const currentHead = current.head.ref;
+
+            const { data: prs } = await github.rest.pulls.list({ owner, repo, state: 'open', per_page: 100 });
+
+            for (const pr of prs) {
+              if (pr.number === currentNumber) continue;
+              const sameTitle = pr.title && pr.title.trim() === currentTitle.trim();
+              const sameHead = pr.head && pr.head.ref === currentHead;
+              if (sameTitle || sameHead) {
+                // Post a comment and close the PR
+                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: `Closing this pull request because it appears to be a duplicate of #${currentNumber}. If you believe this is a mistake, please reopen and explain.` });
+                await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: 'closed' });
+              }
+            }

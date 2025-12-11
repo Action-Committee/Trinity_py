@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trinity_wallet_py"
+version = "1.0.0"
+description = "Trinity Wallet - Python Implementation"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Trinity Development Team"}
+]
+dependencies = [
+    "ecdsa==0.19.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pyinstaller",
+]
+
+[tool.setuptools]
+packages = ["trinity_wallet_py", "trinity_wallet_py.core", "trinity_wallet_py.gui", "trinity_wallet_py.utils"]
