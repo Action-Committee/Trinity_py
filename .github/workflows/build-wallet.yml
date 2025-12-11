@@ -1,0 +1,142 @@
+name: Build Trinity Wallet Executables
+
+on:
+  push:
+    branches: [ main, copilot/** ]
+    paths:
+      - 'trinity_wallet_py/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'trinity_wallet_py/**'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r trinity_wallet_py/requirements.txt
+    
+    - name: Build Windows executable
+      run: |
+        cd trinity_wallet_py
+        pyinstaller TrinityWallet.spec --clean
+    
+    - name: Upload Windows artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-Windows
+        path: trinity_wallet_py/dist/TrinityWallet.exe
+        if-no-files-found: error
+    
+    - name: Create release ZIP
+      run: |
+        cd trinity_wallet_py
+        Copy-Item README.md dist/
+        Copy-Item INSTALL.md dist/
+        cd dist
+        Compress-Archive -Path TrinityWallet.exe,README.md,INSTALL.md -DestinationPath TrinityWallet-Windows.zip
+    
+    - name: Upload Windows ZIP
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-Windows-ZIP
+        path: trinity_wallet_py/dist/TrinityWallet-Windows.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r trinity_wallet_py/requirements.txt
+    
+    - name: Build Linux executable
+      run: |
+        cd trinity_wallet_py
+        pyinstaller TrinityWallet.spec --clean
+    
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-Linux
+        path: trinity_wallet_py/dist/TrinityWallet
+        if-no-files-found: error
+    
+    - name: Create release tarball
+      run: |
+        cd trinity_wallet_py
+        cp README.md INSTALL.md dist/
+        cd dist
+        tar -czf TrinityWallet-Linux.tar.gz TrinityWallet README.md INSTALL.md
+    
+    - name: Upload Linux tarball
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-Linux-TAR
+        path: trinity_wallet_py/dist/TrinityWallet-Linux.tar.gz
+
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r trinity_wallet_py/requirements.txt
+    
+    - name: Build macOS executable
+      run: |
+        cd trinity_wallet_py
+        pyinstaller TrinityWallet.spec --clean
+    
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-macOS
+        path: trinity_wallet_py/dist/TrinityWallet
+        if-no-files-found: error
+    
+    - name: Create release tarball
+      run: |
+        cd trinity_wallet_py
+        cp README.md INSTALL.md dist/
+        cd dist
+        tar -czf TrinityWallet-macOS.tar.gz TrinityWallet README.md INSTALL.md
+    
+    - name: Upload macOS tarball
+      uses: actions/upload-artifact@v3
+      with:
+        name: TrinityWallet-macOS-TAR
+        path: trinity_wallet_py/dist/TrinityWallet-macOS.tar.gz
