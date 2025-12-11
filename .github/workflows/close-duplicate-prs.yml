@@ -37,7 +37,9 @@ jobs:
               const sameHead = pr.head && pr.head.ref === currentHead;
               if (sameTitle || sameHead) {
                 // Post a comment and close the PR
-                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: `Closing this pull request because it appears to be a duplicate of #${currentNumber}. If you believe this is a mistake, please reopen and explain.` });
+                const comment = `Closing this pull request because it appears to be a duplicate of #${currentNumber}.\n\n` +
+                  `If you believe this is a mistake, please reopen and explain.`;
+                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: comment });
                 await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: 'closed' });
               }
             }

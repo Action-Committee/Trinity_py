@@ -21,5 +21,6 @@ dev = [
     "pyinstaller",
 ]
 
-[tool.setuptools]
-packages = ["trinity_wallet_py", "trinity_wallet_py.core", "trinity_wallet_py.gui", "trinity_wallet_py.utils"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trinity_wallet_py*"]
