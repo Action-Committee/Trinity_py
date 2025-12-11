@@ -43,8 +43,11 @@ venv/
 ENV/
 .venv
 *.egg-info/
-dist/
-build/
 .pytest_cache/
 .wallet_data/
 .trinity_wallet/
+
+# PyInstaller build artifacts (but allow releases/)
+trinity_wallet_py/build/
+trinity_wallet_py/dist/
+!trinity_wallet_py/releases/

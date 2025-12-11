@@ -2,6 +2,36 @@
 
 A Windows-compatible wallet for Trinity cryptocurrency, written in Python with a graphical user interface.
 
+## Quick Start
+
+### Option 1: Use Pre-built Executable (Easiest)
+
+**No Python installation required!**
+
+Download pre-built executables from GitHub Actions:
+1. Go to [Actions tab](https://github.com/Action-Committee/Trinity_py/actions)
+2. Click latest "Build Trinity Wallet Executables" workflow
+3. Download for your platform:
+   - **Windows**: `TrinityWallet-Windows.zip` → Extract → Run `TrinityWallet.exe`
+   - **Linux**: `TrinityWallet-Linux.tar.gz` → Extract → Run `./TrinityWallet`
+   - **macOS**: `TrinityWallet-macOS.tar.gz` → Extract → Run `./TrinityWallet`
+
+See [releases/README.md](releases/README.md) for detailed instructions.
+
+### Option 2: Run from Python Source
+
+Requires Python 3.7+:
+
+```bash
+cd trinity_wallet_py
+pip install -r requirements.txt
+python wallet.py
+```
+
+### Option 3: Build Your Own Executable
+
+See [BUILD.md](BUILD.md) for building executables on your platform.
+
 ## Features
 
 - **Full Trinity Network Support**: Compatible with existing Trinity network and consensus
