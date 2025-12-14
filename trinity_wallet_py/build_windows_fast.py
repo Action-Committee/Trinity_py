@@ -49,10 +49,12 @@ def main():
             shutil.rmtree(dir_name)
             print(f"  ✓ Removed {dir_name}/")
     
-    # Remove .spec cache
-    spec_cache = Path('TrinityWallet.spec').with_suffix('.spec.toc')
-    if spec_cache.exists():
-        spec_cache.unlink()
+    # Remove .spec cache files
+    for cache_file in ['TrinityWallet.spec.toc', 'TrinityWallet.spec.manifest']:
+        cache_path = Path(cache_file)
+        if cache_path.exists():
+            cache_path.unlink()
+            print(f"  ✓ Removed {cache_file}")
     
     # Build with optimized settings
     print("\n[3/5] Building executable with PyInstaller...")
@@ -93,7 +95,9 @@ def main():
     
     # Copy to Files folder
     print("\n[5/5] Copying to Files folder...")
-    files_dir = Path("../Files")
+    # Use path relative to script location for robustness
+    script_dir = Path(__file__).parent
+    files_dir = script_dir.parent / 'Files'
     files_dir.mkdir(exist_ok=True)
     
     dest_path = files_dir / exe_path.name
