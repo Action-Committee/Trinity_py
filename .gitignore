@@ -50,7 +50,8 @@ ENV/
 .wallet_data/
 .trinity_wallet/
 
-# PyInstaller build artifacts (but allow releases/)
+# PyInstaller build artifacts (but allow releases/ and Files/)
 trinity_wallet_py/build/
 trinity_wallet_py/dist/
 !trinity_wallet_py/releases/
+!Files/

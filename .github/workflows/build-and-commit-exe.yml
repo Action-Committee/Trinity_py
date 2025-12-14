@@ -1,0 +1,67 @@
+name: Build and Commit Windows Executable
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [ main, master, copilot/** ]
+    paths:
+      - 'trinity_wallet_py/**'
+      - '.github/workflows/build-and-commit-exe.yml'
+
+jobs:
+  build-and-commit-windows-exe:
+    runs-on: windows-latest
+    permissions:
+      contents: write  # Required to commit and push changes
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r trinity_wallet_py/requirements.txt
+    
+    - name: Build Windows executable
+      run: |
+        cd trinity_wallet_py
+        python build_windows_fast.py
+    
+    - name: Verify executable was created
+      run: |
+        if (Test-Path "Files/TrinityWallet.exe") {
+          Write-Host "✓ TrinityWallet.exe created successfully"
+          $size = (Get-Item "Files/TrinityWallet.exe").Length / 1MB
+          Write-Host "  Size: $([math]::Round($size, 2)) MB"
+        } else {
+          Write-Error "✗ TrinityWallet.exe not found!"
+          exit 1
+        }
+      shell: pwsh
+    
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "actions@github.com"
+    
+    - name: Commit and push executable
+      run: |
+        git add Files/
+        git status
+        if (git diff --staged --quiet) {
+          Write-Host "No changes to commit"
+        } else {
+          git commit -m "Build: Add Windows executable to Files folder [skip ci]"
+          git push
+          Write-Host "✓ Windows executable committed and pushed"
+        }
+      shell: pwsh

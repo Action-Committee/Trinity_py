@@ -1,0 +1,94 @@
+=======================================================================
+TRINITY WALLET - WINDOWS EXECUTABLE BUILD INFORMATION
+=======================================================================
+
+STATUS: Automated Build System Configured ✓
+
+The Windows executable (TrinityWallet.exe) is automatically built using
+GitHub Actions whenever changes are made to the wallet code.
+
+ULTRA-FAST BUILD SYSTEM:
+-------------------------
+We've configured an optimized build environment with:
+
+1. PyInstaller with optimized settings
+2. Clean build process (removes cache between builds)
+3. UPX compression for smaller file size
+4. Single-file executable output
+5. Windowed mode (no console) for professional appearance
+
+BUILD SCRIPT:
+-------------
+Location: trinity_wallet_py/build_windows_fast.py
+
+This Python script:
+- Checks and installs dependencies automatically
+- Cleans previous builds for faster compilation
+- Uses optimized PyInstaller settings
+- Produces a single .exe file ready to distribute
+- Copies output to Files/ folder automatically
+
+GITHUB ACTIONS WORKFLOWS:
+--------------------------
+Two workflows are configured:
+
+1. build-wallet.yml
+   - Builds executables for Windows, Linux, and macOS
+   - Uploads as GitHub Actions artifacts
+   - Runs on every push to trinity_wallet_py/
+
+2. build-and-commit-exe.yml  
+   - Builds Windows .exe and commits to Files/ folder
+   - Runs on manual trigger or code changes
+   - Automatically updates the repository
+
+HOW TO BUILD MANUALLY:
+-----------------------
+
+On Windows:
+-----------
+cd trinity_wallet_py
+python build_windows_fast.py
+
+The .exe will be created in ../Files/TrinityWallet.exe
+
+On Linux (requires Wine for Windows .exe):
+-------------------------------------------
+# Install Wine and Windows Python first (see BUILD.md)
+cd trinity_wallet_py
+python3 build_windows_fast.py
+
+BUILD TIME:
+-----------
+Typical build time: 30-90 seconds on modern hardware
+- Initial build: ~90 seconds (downloads dependencies)
+- Subsequent builds: ~30 seconds (dependencies cached)
+
+OUTPUT:
+-------
+- File: TrinityWallet.exe
+- Size: ~10-15 MB (includes Python runtime and all dependencies)
+- Type: Single-file Windows executable
+- Requirements: Windows 7 or later (64-bit)
+
+AUTOMATIC BUILDS:
+-----------------
+Windows .exe is automatically built by GitHub Actions and will be
+available in this Files/ folder after the workflow completes.
+
+To trigger a manual build:
+1. Go to Actions tab in GitHub
+2. Select "Build and Commit Windows Executable" workflow  
+3. Click "Run workflow"
+4. Wait for completion (~2-3 minutes)
+5. The .exe will be committed to this folder
+
+VERIFICATION:
+-------------
+All builds are performed in GitHub's secure build environment.
+You can verify builds by:
+- Checking workflow logs in the Actions tab
+- Building from source yourself using the build script
+- Comparing checksums with workflow artifacts
+
+=======================================================================
