@@ -4,12 +4,16 @@ TRINITY WALLET - PRE-COMPILED EXECUTABLES
 
 This folder contains pre-compiled executables of the Trinity Python Wallet.
 
+ULTRA-FAST BUILD SYSTEM CONFIGURED ✓
+The Windows .exe will be automatically built and placed here by GitHub Actions.
+
 CONTENTS:
 ---------
-- TrinityWallet.exe     Windows executable (built by GitHub Actions)
-- TrinityWallet         Linux executable (for reference)
+- TrinityWallet.exe     Windows executable (auto-built by GitHub Actions)
+- TrinityWallet         Linux executable (for testing/reference)
 - README.md             User documentation
 - INSTALL.md            Installation guide
+- BUILD_INFO.txt        Build system information
 
 WINDOWS USERS:
 --------------
