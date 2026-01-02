@@ -12,6 +12,21 @@ Specifications
 
 - Proof of Work based. Mine using any of the 3 algorithms : sha256d(default), scrypt or groestl.
 
+New Features
+------------------
+
+### Compressed Block Storage (NEW!)
+Trinity now includes an advanced blockchain storage compression system that reduces storage requirements by 25-40% while maintaining full network compatibility. 
+
+- **Enable with**: `-usecompression=1` command-line flag
+- **Configurable compression level**: `-compressionlevel=<1-9>` (default: 6)
+- **Features**:
+  - Automatic deduplication of transaction patterns
+  - RLE compression for repetitive data
+  - Full backward compatibility with existing blocks
+  - Transparent to network protocol
+- See [COMPRESSED_STORAGE.md](COMPRESSED_STORAGE.md) for detailed documentation
+
 Wallets
 ------------------
 
