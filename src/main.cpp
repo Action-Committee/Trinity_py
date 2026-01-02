@@ -15,6 +15,7 @@
 #include "ui_interface.h"
 #include "checkqueue.h"
 #include "chainparams.h"
+#include "compressedstorage.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -1192,8 +1193,25 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
     if (!fileout)
         return error("WriteBlockToDisk() : OpenBlockFile failed");
 
-    // Write index header
-    unsigned int nSize = fileout.GetSerializeSize(block);
+    // Serialize block to buffer first (for compression)
+    CDataStream ssBlock(SER_DISK, CLIENT_VERSION);
+    ssBlock << block;
+    
+    // Convert to vector for compression
+    std::vector<unsigned char> vchBlock(ssBlock.begin(), ssBlock.end());
+    std::vector<unsigned char> vchCompressed;
+    
+    // Apply compression if enabled
+    if (compressedStorage.IsCompressionEnabled()) {
+        if (!compressedStorage.CompressBlock(vchBlock, vchCompressed)) {
+            return error("WriteBlockToDisk() : compression failed");
+        }
+    } else {
+        vchCompressed = vchBlock;
+    }
+    
+    // Write index header with compressed size
+    unsigned int nSize = vchCompressed.size();
     fileout << FLATDATA(Params().MessageStart()) << nSize;
 
     // Write block
@@ -1201,7 +1219,9 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
     if (fileOutPos < 0)
         return error("WriteBlockToDisk() : ftell failed");
     pos.nPos = (unsigned int)fileOutPos;
-    fileout << block;
+    
+    // Write compressed block data
+    fileout.write((const char*)&vchCompressed[0], vchCompressed.size());
 
     // Flush stdio buffers and commit to disk before returning
     fflush(fileout);
@@ -1220,9 +1240,28 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos)
     if (!filein)
         return error("ReadBlockFromDisk(CBlock&, CDiskBlockPos&) : OpenBlockFile failed");
 
-    // Read block
+    // Read block - need to handle both compressed and uncompressed formats
     try {
-        filein >> block;
+        // Try to peek at the data to check if it's compressed
+        std::vector<unsigned char> vchCompressed;
+        
+        // Read the serialized data
+        filein >> vchCompressed;
+        
+        // Decompress if necessary
+        std::vector<unsigned char> vchBlock;
+        if (compressedStorage.IsCompressionEnabled()) {
+            if (!compressedStorage.DecompressBlock(vchCompressed, vchBlock)) {
+                // If decompression fails, might be uncompressed data
+                vchBlock = vchCompressed;
+            }
+        } else {
+            vchBlock = vchCompressed;
+        }
+        
+        // Deserialize from decompressed data
+        CDataStream ssBlock(vchBlock, SER_DISK, CLIENT_VERSION);
+        ssBlock >> block;
     }
     catch (std::exception &e) {
         return error("%s() : deserialize or I/O error", __PRETTY_FUNCTION__);
