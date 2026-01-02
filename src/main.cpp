@@ -1221,7 +1221,7 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
     pos.nPos = (unsigned int)fileOutPos;
     
     // Write compressed block data
-    fileout.write((const char*)&vchCompressed[0], vchCompressed.size());
+    fileout.write((const char*)vchCompressed.data(), vchCompressed.size());
 
     // Flush stdio buffers and commit to disk before returning
     fflush(fileout);

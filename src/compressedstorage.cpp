@@ -130,7 +130,7 @@ bool CCompressedStorage::DecompressData(const std::vector<unsigned char>& input,
     
     size_t i = 0;
     while (i < input.size()) {
-        if (input[i] == 0xFF && i + 2 < input.size()) {
+        if (input[i] == 0xFF && i + 2 < input.size() && i + 3 <= input.size()) {
             // Decompress RLE sequence
             unsigned char runLength = input[i + 1];
             unsigned char value = input[i + 2];
@@ -199,13 +199,13 @@ bool CCompressedStorage::DeltaDecode(const std::vector<unsigned char>& base,
     size_t minSize = std::min(base.size(), targetSize);
     
     // Decode common part
-    for (size_t i = 0; i < minSize && (i + 4) < delta.size(); i++) {
+    for (size_t i = 0; i < minSize && (i + 4) < delta.size() && (i + 5) <= delta.size(); i++) {
         target.push_back(base[i] ^ delta[i + 4]);
     }
     
     // Add remaining bytes if target is larger
     if (targetSize > base.size()) {
-        for (size_t i = minSize; (i + 4) < delta.size(); i++) {
+        for (size_t i = minSize; (i + 4) < delta.size() && (i + 5) <= delta.size(); i++) {
             target.push_back(delta[i + 4]);
         }
     }
@@ -353,7 +353,7 @@ bool CCompressedStorage::DecompressTransaction(const std::vector<unsigned char>&
     }
     
     // Check for deduplication marker
-    if (input[0] == 0xFE && input.size() == 33) {
+    if (input[0] == 0xFE && input.size() >= 33 && input.size() == 33) {
         uint256 patternHash;
         memcpy(patternHash.begin(), &input[1], 32);
         
