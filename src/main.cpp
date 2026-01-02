@@ -1242,26 +1242,27 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos)
 
     // Read block - need to handle both compressed and uncompressed formats
     try {
-        // Try to peek at the data to check if it's compressed
-        std::vector<unsigned char> vchCompressed;
-        
-        // Read the serialized data
-        filein >> vchCompressed;
-        
-        // Decompress if necessary
-        std::vector<unsigned char> vchBlock;
         if (compressedStorage.IsCompressionEnabled()) {
+            // Read into a data stream first
+            CDataStream ssBlock(SER_DISK, CLIENT_VERSION);
+            filein >> ssBlock;
+            
+            // Convert to vector for decompression
+            std::vector<unsigned char> vchCompressed(ssBlock.begin(), ssBlock.end());
+            std::vector<unsigned char> vchBlock;
+            
+            // Try to decompress - will return original if not compressed
             if (!compressedStorage.DecompressBlock(vchCompressed, vchBlock)) {
-                // If decompression fails, might be uncompressed data
-                vchBlock = vchCompressed;
+                return error("ReadBlockFromDisk(CBlock&, CDiskBlockPos&) : decompression failed");
             }
+            
+            // Deserialize from decompressed data
+            CDataStream ssDecompressed(vchBlock, SER_DISK, CLIENT_VERSION);
+            ssDecompressed >> block;
         } else {
-            vchBlock = vchCompressed;
+            // Read directly without compression support
+            filein >> block;
         }
-        
-        // Deserialize from decompressed data
-        CDataStream ssBlock(vchBlock, SER_DISK, CLIENT_VERSION);
-        ssBlock >> block;
     }
     catch (std::exception &e) {
         return error("%s() : deserialize or I/O error", __PRETTY_FUNCTION__);
