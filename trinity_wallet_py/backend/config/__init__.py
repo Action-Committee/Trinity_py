@@ -112,7 +112,6 @@ class BackendConfig:
             # Ensure directory exists
             self.config_path.parent.mkdir(parents=True, exist_ok=True)
             
-            # Use self.config instead of just config
             with open(self.config_path, 'w') as f:
                 json.dump(self.config, f, indent=2)
             

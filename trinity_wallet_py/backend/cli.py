@@ -8,6 +8,7 @@ Command-line interface for managing Trinity backend services.
 import sys
 import argparse
 import json
+import requests
 from pathlib import Path
 
 from .server import TrinityBackendServer
@@ -73,8 +74,6 @@ def cmd_config(args):
 
 def cmd_status(args):
     """Check backend service status."""
-    import requests
-    
     config = BackendConfig(args.config)
     host = config.get('server.host', '127.0.0.1')
     port = config.get('server.port', 5000)

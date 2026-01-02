@@ -6,7 +6,6 @@ Provides mining pool management including work distribution and share tracking.
 
 from typing import Dict, Any, Optional, List
 import time
-import hashlib
 from .base_service import BaseService
 from ...core.rpc_client import TrinityRPCClient
 

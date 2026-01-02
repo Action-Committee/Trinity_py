@@ -187,8 +187,12 @@ def test_mining_pool_service():
     assert 'work_distribution' in info['capabilities'], "Missing work_distribution capability"
     print("  ✓ Service info correct")
     
-    # Test miner management (without RPC)
-    service._running = True  # Fake running state
+    # Test miner management (simulate running state for testing without RPC)
+    # Note: We test the internal logic without actually starting the service
+    # which would require a Trinity node connection
+    
+    # Manually set running state for internal logic testing
+    service._running = True
     
     # Test get work
     work = service.get_work('miner_001')
@@ -206,6 +210,9 @@ def test_mining_pool_service():
     assert 'total_miners' in pool_stats, "Pool stats missing total_miners"
     assert pool_stats['total_miners'] == 1, "Total miners incorrect"
     print("  ✓ Pool stats work")
+    
+    # Clean up
+    service._running = False
     
     print("✓ Mining Pool service tests passed\n")
 
