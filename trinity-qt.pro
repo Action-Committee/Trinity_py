@@ -169,6 +169,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/uint256.h \
     src/serialize.h \
     src/core.h \
+    src/compressedstorage.h \
     src/main.h \
     src/net.h \
     src/key.h \
@@ -264,6 +265,7 @@ SOURCES += src/qt/bitcoin.cpp \
     src/key.cpp \
     src/script.cpp \
     src/core.cpp \
+    src/compressedstorage.cpp \
     src/main.cpp \
     src/init.cpp \
     src/net.cpp \
