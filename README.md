@@ -12,10 +12,10 @@ Specifications
 
 - Proof of Work based. Mine using any of the 3 algorithms : sha256d(default), scrypt or groestl.
 
-Wallets
+Wallets & Services
 ------------------
 
-Trinity now includes two wallet implementations:
+Trinity now includes two wallet implementations and a backend service framework:
 
 1. **Trinity Core (C++)** - Original Qt-based wallet
    - Full node with mining support
@@ -28,6 +28,15 @@ Trinity now includes two wallet implementations:
    - Located in `trinity_wallet_py/` directory
    - Quick setup: `cd trinity_wallet_py && pip install -r requirements.txt`
    - See [PYTHON_WALLET.md](PYTHON_WALLET.md) for full documentation
+
+3. **Trinity Backend Services** - NEW! 🚀
+   - Modular backend framework for cryptocurrency services
+   - Block Explorer service for blockchain queries
+   - Mining Pool service for pool operations
+   - REST API with local and webserver deployment
+   - Located in `trinity_wallet_py/backend/` directory
+   - Quick start: `python -m trinity_wallet_py.backend.cli start`
+   - See [trinity_wallet_py/backend/README.md](trinity_wallet_py/backend/README.md) for full documentation
 
 License
 -------
