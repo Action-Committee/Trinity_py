@@ -7,10 +7,10 @@ A Python-based Windows wallet for Trinity cryptocurrency.
 import sys
 import os
 
-# Add parent directory to path if needed
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from trinity_wallet_py.gui.main_window import TrinityWalletGUI
+from gui.main_window import TrinityWalletGUI
 
 
 def main():
