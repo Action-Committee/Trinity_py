@@ -124,6 +124,7 @@ OBJS= \
     obj/bitcoind.o \
     obj/keystore.o \
     obj/core.o \
+    obj/compressedstorage.o \
     obj/main.o \
     obj/net.o \
     obj/protocol.o \
