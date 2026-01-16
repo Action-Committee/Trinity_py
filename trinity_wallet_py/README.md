@@ -43,6 +43,7 @@ See [BUILD.md](BUILD.md) for building executables on your platform.
 
 ## Features
 
+### Core Wallet Features
 - **Full Trinity Network Support**: Compatible with existing Trinity network and consensus
 - **Key Management**: Generate new addresses, import/export private keys
 - **Transaction Management**: Send and receive TRINITY coins
@@ -51,6 +52,17 @@ See [BUILD.md](BUILD.md) for building executables on your platform.
 - **Secure Storage**: Local wallet storage with restricted permissions
 - **Address Labels**: Organize your addresses with custom labels
 - **Multi-Algorithm Support**: Works with SHA256D, Scrypt, and Groestl mining
+
+### Solo Mining Features (NEW!)
+- **Integrated Mining**: Mine Trinity coins directly from the wallet
+- **SHA256d Algorithm**: Uses Trinity's default mining algorithm
+- **Multi-threaded Support**: Configure 1-16 mining threads for optimal performance
+- **Real-time Statistics**: Monitor hashrate, blocks found, and mining progress
+- **Mining Log**: View real-time mining events and status updates
+- **Address Selection**: Mine directly to any wallet address
+- **Easy Controls**: Start/stop mining with one click
+
+📖 **See [MINING.md](MINING.md) for complete mining documentation.**
 
 ## Installation
 

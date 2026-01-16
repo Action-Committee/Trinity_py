@@ -8,6 +8,7 @@ import threading
 from typing import Optional
 from ..core.wallet import Wallet
 from ..core.key import validate_address
+from ..core.miner import SoloMiner
 
 
 class TrinityWalletGUI:
@@ -16,6 +17,7 @@ class TrinityWalletGUI:
     def __init__(self):
         """Initialize the GUI."""
         self.wallet: Optional[Wallet] = None
+        self.miner: Optional[SoloMiner] = None
         self.root = tk.Tk()
         self.root.title("Trinity Wallet")
         self.root.geometry("900x700")
@@ -37,6 +39,9 @@ class TrinityWalletGUI:
         # Initial update
         self.update_balance()
         self.update_addresses()
+        
+        # Setup miner update timer
+        self.root.after(2000, self._update_mining_stats)
     
     def setup_ui(self):
         """Set up the user interface."""
@@ -109,6 +114,11 @@ class TrinityWalletGUI:
         addresses_frame = ttk.Frame(notebook, padding="10")
         notebook.add(addresses_frame, text="Addresses")
         self.setup_addresses_tab(addresses_frame)
+        
+        # Mining tab
+        mining_frame = ttk.Frame(notebook, padding="10")
+        notebook.add(mining_frame, text="Mining")
+        self.setup_mining_tab(mining_frame)
         
         # Status bar
         self.status_label = ttk.Label(main_frame, text="Status: Ready", 
@@ -190,6 +200,207 @@ class TrinityWalletGUI:
         
         ttk.Button(button_frame, text="Set Label", command=self.set_address_label).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Refresh", command=self.update_addresses).pack(side=tk.LEFT, padx=5)
+    
+    def setup_mining_tab(self, parent):
+        """Set up the Mining tab."""
+        # Mining info section
+        info_frame = ttk.LabelFrame(parent, text="Mining Information", padding="10")
+        info_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        info_text = tk.Label(info_frame, text="Solo mine Trinity coins directly to your wallet.\n" +
+                             "Mining uses SHA256d algorithm (Trinity's default).", 
+                             justify=tk.LEFT, wraplength=800)
+        info_text.pack(anchor=tk.W)
+        
+        # Control section
+        control_frame = ttk.LabelFrame(parent, text="Mining Controls", padding="10")
+        control_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        # Number of threads
+        thread_frame = ttk.Frame(control_frame)
+        thread_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(thread_frame, text="Mining Threads:").pack(side=tk.LEFT, padx=(0, 10))
+        self.mining_threads_var = tk.IntVar(value=1)
+        thread_spinbox = ttk.Spinbox(thread_frame, from_=1, to=16, 
+                                     textvariable=self.mining_threads_var, width=10)
+        thread_spinbox.pack(side=tk.LEFT)
+        
+        # Mining address
+        address_frame = ttk.Frame(control_frame)
+        address_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(address_frame, text="Mining Address:").pack(side=tk.LEFT, padx=(0, 10))
+        self.mining_address_label = ttk.Label(address_frame, text="(Select an address below)", 
+                                              font=("Courier", 9))
+        self.mining_address_label.pack(side=tk.LEFT)
+        
+        # Address selection
+        address_select_frame = ttk.Frame(control_frame)
+        address_select_frame.pack(fill=tk.X, pady=5)
+        
+        self.mining_address_var = tk.StringVar()
+        self.mining_address_combo = ttk.Combobox(address_select_frame, 
+                                                 textvariable=self.mining_address_var,
+                                                 state='readonly', width=50)
+        self.mining_address_combo.pack(side=tk.LEFT, padx=(0, 10))
+        self._update_mining_addresses()
+        
+        ttk.Button(address_select_frame, text="New Address", 
+                  command=self._new_mining_address).pack(side=tk.LEFT)
+        
+        # Start/Stop buttons
+        button_frame = ttk.Frame(control_frame)
+        button_frame.pack(fill=tk.X, pady=10)
+        
+        self.mining_start_btn = ttk.Button(button_frame, text="Start Mining", 
+                                           command=self.start_mining)
+        self.mining_start_btn.pack(side=tk.LEFT, padx=5)
+        
+        self.mining_stop_btn = ttk.Button(button_frame, text="Stop Mining", 
+                                          command=self.stop_mining, state=tk.DISABLED)
+        self.mining_stop_btn.pack(side=tk.LEFT, padx=5)
+        
+        # Statistics section
+        stats_frame = ttk.LabelFrame(parent, text="Mining Statistics", padding="10")
+        stats_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Stats grid
+        self.mining_status_label = ttk.Label(stats_frame, text="Status: Stopped", 
+                                            font=("Arial", 10, "bold"))
+        self.mining_status_label.grid(row=0, column=0, columnspan=2, sticky=tk.W, pady=5)
+        
+        ttk.Label(stats_frame, text="Hashrate:").grid(row=1, column=0, sticky=tk.W, pady=2)
+        self.mining_hashrate_label = ttk.Label(stats_frame, text="0 H/s")
+        self.mining_hashrate_label.grid(row=1, column=1, sticky=tk.W, pady=2)
+        
+        ttk.Label(stats_frame, text="Hashes Done:").grid(row=2, column=0, sticky=tk.W, pady=2)
+        self.mining_hashes_label = ttk.Label(stats_frame, text="0")
+        self.mining_hashes_label.grid(row=2, column=1, sticky=tk.W, pady=2)
+        
+        ttk.Label(stats_frame, text="Blocks Found:").grid(row=3, column=0, sticky=tk.W, pady=2)
+        self.mining_blocks_label = ttk.Label(stats_frame, text="0")
+        self.mining_blocks_label.grid(row=3, column=1, sticky=tk.W, pady=2)
+        
+        ttk.Label(stats_frame, text="Shares Submitted:").grid(row=4, column=0, sticky=tk.W, pady=2)
+        self.mining_shares_label = ttk.Label(stats_frame, text="0")
+        self.mining_shares_label.grid(row=4, column=1, sticky=tk.W, pady=2)
+        
+        ttk.Label(stats_frame, text="Runtime:").grid(row=5, column=0, sticky=tk.W, pady=2)
+        self.mining_runtime_label = ttk.Label(stats_frame, text="0s")
+        self.mining_runtime_label.grid(row=5, column=1, sticky=tk.W, pady=2)
+        
+        # Mining log
+        log_frame = ttk.LabelFrame(parent, text="Mining Log", padding="5")
+        log_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.mining_log = scrolledtext.ScrolledText(log_frame, height=8, width=80, 
+                                                    font=("Courier", 8))
+        self.mining_log.pack(fill=tk.BOTH, expand=True)
+        self.mining_log.config(state=tk.DISABLED)
+    
+    def _update_mining_addresses(self):
+        """Update the mining address dropdown."""
+        addresses = self.wallet.get_addresses() if self.wallet else []
+        if addresses:
+            self.mining_address_combo['values'] = addresses
+            if not self.mining_address_var.get():
+                self.mining_address_var.set(addresses[0])
+    
+    def _new_mining_address(self):
+        """Create a new address for mining."""
+        self.new_address()
+        self._update_mining_addresses()
+    
+    def _log_mining_message(self, message: str):
+        """Add message to mining log."""
+        self.mining_log.config(state=tk.NORMAL)
+        self.mining_log.insert(tk.END, f"{message}\n")
+        self.mining_log.see(tk.END)
+        self.mining_log.config(state=tk.DISABLED)
+    
+    def _mining_callback(self, notification: dict):
+        """Callback for mining events."""
+        message = notification.get('message', '')
+        self._log_mining_message(message)
+    
+    def start_mining(self):
+        """Start solo mining."""
+        if not self.wallet or not self.wallet.rpc:
+            messagebox.showerror("Error", "Not connected to Trinity node. Please connect first.")
+            return
+        
+        mining_address = self.mining_address_var.get()
+        if not mining_address:
+            messagebox.showerror("Error", "Please select a mining address.")
+            return
+        
+        num_threads = self.mining_threads_var.get()
+        
+        try:
+            # Create miner instance
+            self.miner = SoloMiner(
+                rpc_client=self.wallet.rpc,
+                num_threads=num_threads,
+                callback=self._mining_callback
+            )
+            
+            # Start mining in background thread
+            thread = threading.Thread(target=self.miner.start, daemon=True)
+            thread.start()
+            
+            # Update UI
+            self.mining_start_btn.config(state=tk.DISABLED)
+            self.mining_stop_btn.config(state=tk.NORMAL)
+            self.mining_status_label.config(text="Status: Mining")
+            self._log_mining_message(f"Mining started with {num_threads} thread(s) to address {mining_address}")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to start mining: {str(e)}")
+    
+    def stop_mining(self):
+        """Stop solo mining."""
+        if self.miner:
+            try:
+                self.miner.stop()
+                self.miner = None
+                
+                # Update UI
+                self.mining_start_btn.config(state=tk.NORMAL)
+                self.mining_stop_btn.config(state=tk.DISABLED)
+                self.mining_status_label.config(text="Status: Stopped")
+                self._log_mining_message("Mining stopped")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to stop mining: {str(e)}")
+    
+    def _update_mining_stats(self):
+        """Update mining statistics display."""
+        if self.miner and self.miner.mining:
+            stats = self.miner.get_stats()
+            
+            # Update labels
+            hashrate = stats['hashrate']
+            if hashrate > 1000000:
+                hashrate_str = f"{hashrate/1000000:.2f} MH/s"
+            elif hashrate > 1000:
+                hashrate_str = f"{hashrate/1000:.2f} KH/s"
+            else:
+                hashrate_str = f"{hashrate:.2f} H/s"
+            
+            self.mining_hashrate_label.config(text=hashrate_str)
+            self.mining_hashes_label.config(text=f"{stats['hashes_done']:,}")
+            self.mining_blocks_label.config(text=str(stats['blocks_found']))
+            self.mining_shares_label.config(text=f"{stats['shares_accepted']}/{stats['shares_submitted']}")
+            
+            runtime = int(stats['runtime'])
+            hours = runtime // 3600
+            minutes = (runtime % 3600) // 60
+            seconds = runtime % 60
+            self.mining_runtime_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
+        
+        # Schedule next update
+        self.root.after(2000, self._update_mining_stats)
     
     def connect_to_default_node(self):
         """Connect to local Trinity node with default settings."""
