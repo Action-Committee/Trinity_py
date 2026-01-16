@@ -11,6 +11,7 @@ Specifications
 ------------------
 
 - Proof of Work based. Mine using any of the 3 algorithms : sha256d(default), scrypt or groestl.
+- For mining software and guides, see [doc/mining.md](doc/mining.md)
 
 New Features
 ------------------

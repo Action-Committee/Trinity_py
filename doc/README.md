@@ -67,4 +67,5 @@ Other Pages
 ---------------------
 - [Assets Attribution](assets-attribution.md)
 - [Files](files.md)
+- [Mining Guide](mining.md)
 - [Tor Support](tor.md)
