@@ -105,8 +105,8 @@ Trinity also includes a Python-based mining pool service in the backend framewor
 
 ## Additional Resources
 
-- Trinity GitHub: https://github.com/Action-Committee/Trinity_py
 - Mining Pool service documentation: `trinity_wallet_py/backend/README.md`
 - Reference implementation: `contrib/pyminer/`
+- Main project documentation: `README.md`
 
 For more information about Trinity specifications and algorithms, see the main README.md.
