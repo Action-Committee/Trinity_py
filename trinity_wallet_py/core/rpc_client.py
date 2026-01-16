@@ -177,3 +177,42 @@ class TrinityRPCClient:
     def getmininginfo(self) -> Dict:
         """Get mining information."""
         return self._call('getmininginfo')
+    
+    def getwork(self, data: str = None) -> Dict:
+        """
+        Get work for mining or submit a solution.
+        
+        Args:
+            data: Hex-encoded block data to submit (optional)
+            
+        Returns:
+            Work data if no data provided, or submission result
+        """
+        if data is None:
+            return self._call('getwork')
+        else:
+            return self._call('getwork', [data])
+    
+    def getblocktemplate(self, params: Dict = None) -> Dict:
+        """
+        Get block template for mining.
+        
+        Args:
+            params: Template request parameters
+            
+        Returns:
+            Block template data
+        """
+        if params is None:
+            params = {}
+        return self._call('getblocktemplate', [params])
+    
+    def setgenerate(self, generate: bool, genproclimit: int = -1) -> None:
+        """
+        Enable/disable mining.
+        
+        Args:
+            generate: True to enable mining, False to disable
+            genproclimit: Number of processors to use (-1 for all)
+        """
+        self._call('setgenerate', [generate, genproclimit])
