@@ -346,10 +346,7 @@ class TrinityWalletGUI:
             )
             
             # Start mining in background thread
-            def start_mining_thread():
-                self.miner.start()
-            
-            thread = threading.Thread(target=start_mining_thread, daemon=True)
+            thread = threading.Thread(target=self.miner.start, daemon=True)
             thread.start()
             
             # Update UI

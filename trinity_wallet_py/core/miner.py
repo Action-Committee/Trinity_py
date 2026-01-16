@@ -118,9 +118,11 @@ class SoloMiner:
             'runtime': time.time() - self.start_time
         })
         
-        # Wait for threads to finish
+        # Wait for threads to finish with reasonable timeout
         for thread in self.threads:
-            thread.join(timeout=2.0)
+            thread.join(timeout=5.0)
+            if thread.is_alive():
+                self._notify(f"Warning: Thread {thread.name} did not stop cleanly")
         self.threads.clear()
     
     def get_stats(self) -> Dict[str, Any]:
@@ -223,7 +225,8 @@ class SoloMiner:
         
         # Try different nonces
         for nonce in range(self.max_nonce):
-            if not self.mining:
+            # Check mining flag periodically for better performance
+            if nonce % 1000 == 0 and not self.mining:
                 return (nonce, None)
             
             # Encode 32-bit nonce value
